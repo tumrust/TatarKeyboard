@@ -32,6 +32,11 @@ enum TatarScript: String, CaseIterable, Identifiable {
     /// В арабском алфавите нет заглавных букв — Shift не нужен
     var supportsShift: Bool { self != .arabic }
 
+    /// Локаль для смены регистра: в латинице i/İ и ı/I — пары как в турецком.
+    var caseLocale: Locale {
+        Locale(identifier: self == .latin ? "tr" : "tt")
+    }
+
     var spaceLabel: String {
         switch self {
         case .arabic: return "فاصыла"
@@ -40,15 +45,23 @@ enum TatarScript: String, CaseIterable, Identifiable {
     }
 }
 
-/// Одна клавиша: основной символ + вариант по долгому нажатию (может отсутствовать)
+/// Одна клавиша: основной символ + варианты по долгому нажатию (могут отсутствовать).
+/// Первый вариант (`alt`) дополнительно подписан мелко в углу буквенной клавиши.
 struct KeyDefinition: Identifiable {
     let id = UUID()
     let main: String
-    let alt: String?
+    let alts: [String]
+
+    var alt: String? { alts.first }
 
     init(_ main: String, alt: String? = nil) {
         self.main = main
-        self.alt = alt
+        self.alts = alt.map { [$0] } ?? []
+    }
+
+    init(_ main: String, alts: [String]) {
+        self.main = main
+        self.alts = alts
     }
 }
 
@@ -59,7 +72,7 @@ extension UIReturnKeyType {
         case .cyrillic:
             switch self {
             case .go:            return "Күчү"
-            case .search:        return "Эзләү"
+            case .search, .google, .yahoo: return "Эзләү"
             case .send:          return "Җибәрү"
             case .join:          return "Кушылу"
             case .next:          return "Алга"
@@ -72,7 +85,7 @@ extension UIReturnKeyType {
         case .latin:
             switch self {
             case .go:            return "Küçü"
-            case .search:        return "Ezläw"
+            case .search, .google, .yahoo: return "Ezläw"
             case .send:          return "Cibärü"
             case .join:          return "Kuşılu"
             case .next:          return "Alğa"
@@ -103,19 +116,44 @@ enum TatarLayout {
 
     /// Страница «123» — как в системной клавиатуре iOS
     static func numberRows(for script: TatarScript) -> [[KeyDefinition]] {
-        let row1 = ["1","2","3","4","5","6","7","8","9","0"].map { KeyDefinition($0) }
-        let row2 = ["-","/",":",";","(",")","₽","&","@","\""].map { KeyDefinition($0) }
-        let row3 = [".",",","?","!","'"].map { KeyDefinition($0) }
+        let row1 = ["1","2","3","4","5","6","7","8","9","0"].map { KeyDefinition($0, alts: numberAlternates[$0] ?? []) }
+        let row2 = ["-","/",":",";","(",")","₽","&","@","\""].map { KeyDefinition($0, alts: numberAlternates[$0] ?? []) }
+        let row3 = punctuationRow
         return [row1, row2, row3]
     }
 
     /// Страница «#+=» — вторая страница символов, как в системной клавиатуре iOS
     static func symbolRows(for script: TatarScript) -> [[KeyDefinition]] {
         let row1 = ["[","]","{","}","#","%","^","*","+","="].map { KeyDefinition($0) }
-        let row2 = ["_","\\","|","~","<",">","€","£","¥","•"].map { KeyDefinition($0) }
-        let row3 = [".",",","?","!","'"].map { KeyDefinition($0) }
+        let row2 = ["_","\\","|","~","<",">","€","£","¥","•"].map { KeyDefinition($0, alts: numberAlternates[$0] ?? []) }
+        let row3 = punctuationRow
         return [row1, row2, row3]
     }
+
+    /// Общий 3-й ряд страниц 123 и #+=.
+    private static var punctuationRow: [KeyDefinition] {
+        [".",",","?","!","'"].map { KeyDefinition($0, alts: numberAlternates[$0] ?? []) }
+    }
+
+    /// Варианты по долгому нажатию на страницах 123 / #+= — как в системной клавиатуре.
+    private static let numberAlternates: [String: [String]] = [
+        "0": ["°"],
+        "-": ["–", "—", "•"],
+        "/": ["\\"],
+        "₽": ["$", "€", "£", "¥", "₸", "₺"],
+        "&": ["§"],
+        "\"": ["«", "»", "„", "“", "”"],
+        "'": ["’", "‘", "`"],
+        ".": ["…"],
+        "?": ["¿"],
+        "!": ["¡"],
+        "%": ["‰"],
+        "•": ["·"],
+        "€": ["₽", "$", "£", "¥"]
+    ]
+
+    /// Цифровая панель для полей .numberPad / .decimalPad / .phonePad (3 × 3, нижний ряд — отдельно).
+    static let digitPadRows: [[String]] = [["1","2","3"], ["4","5","6"], ["7","8","9"]]
 
     // MARK: - Кириллица
     // Раскладка повторяет физическую клавиатуру Татарстана: основной символ — чёрным,
@@ -126,31 +164,33 @@ enum TatarLayout {
 
         let row1: [KeyDefinition] = [
             KeyDefinition(c("й","Й")),
-            KeyDefinition(c("ө","Ө"), alt: c("ц","Ц")),
-            KeyDefinition(c("у","У")),
+            KeyDefinition(c("ц","Ц")),
+            KeyDefinition(c("у","У"), alt: c("ү","Ү")),
             KeyDefinition(c("к","К")),
             KeyDefinition(c("е","Е"), alt: c("ё","Ё")),
-            KeyDefinition(c("н","Н")),
+            KeyDefinition(c("н","Н"), alt: c("ң","Ң")),
             KeyDefinition(c("г","Г")),
             KeyDefinition(c("ш","Ш")),
-            KeyDefinition(c("ә","Ә"), alt: c("щ","Щ")),
+            KeyDefinition(c("щ","Щ")),
             KeyDefinition(c("з","З")),
-            KeyDefinition(c("х","Х")),
-            KeyDefinition(c("ү","Ү"), alt: c("ъ","Ъ"))
+            KeyDefinition(c("х","Х"), alt: c("һ","Һ")),
+            KeyDefinition(c("ъ","Ъ"))
         ]
+
         let row2: [KeyDefinition] = [
             KeyDefinition(c("ф","Ф")),
             KeyDefinition(c("ы","Ы")),
             KeyDefinition(c("в","В")),
-            KeyDefinition(c("а","А")),
+            KeyDefinition(c("а","А"), alt: c("ә","Ә")),
             KeyDefinition(c("п","П")),
             KeyDefinition(c("р","Р")),
-            KeyDefinition(c("о","О")),
+            KeyDefinition(c("о","О"), alt: c("ө","Ө")),
             KeyDefinition(c("л","Л")),
             KeyDefinition(c("д","Д")),
-            KeyDefinition(c("ң","Ң"), alt: c("ж","Ж")),
-            KeyDefinition(c("э","Э")),
+            KeyDefinition(c("ж","Ж"), alt: c("җ","Җ")),
+            KeyDefinition(c("э","Э"))
         ]
+
         let row3: [KeyDefinition] = [
             KeyDefinition(c("я","Я")),
             KeyDefinition(c("ч","Ч")),
@@ -158,11 +198,11 @@ enum TatarLayout {
             KeyDefinition(c("м","М")),
             KeyDefinition(c("и","И")),
             KeyDefinition(c("т","Т")),
-            KeyDefinition(c("җ","Җ"), alt: c("ь","Ь")),
+            KeyDefinition(c("ь","Ь")),
             KeyDefinition(c("б","Б")),
-            KeyDefinition(c("ю","Ю")),
-            KeyDefinition(c("һ","Һ")),
+            KeyDefinition(c("ю","Ю"))
         ]
+
         return [row1, row2, row3]
     }
 

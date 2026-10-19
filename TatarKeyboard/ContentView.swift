@@ -7,6 +7,11 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var demoText: String = ""
+    // Общий App Group с клавиатурой — см. KeyboardSettings.
+    @AppStorage(KeyboardSettings.soundEnabledKey, store: KeyboardSettings.store)
+    private var isSoundEnabled = true
+    @AppStorage(KeyboardSettings.hapticsEnabledKey, store: KeyboardSettings.store)
+    private var isHapticsEnabled = true
 
     var body: some View {
         NavigationView {
@@ -15,6 +20,19 @@ struct ContentView: View {
                     TextEditor(text: $demoText)
                         .frame(minHeight: 120)
                         .font(.system(size: 20))
+                }
+
+                Section {
+                    Toggle(isOn: $isSoundEnabled) {
+                        Label("Звук клавиш", systemImage: "speaker.wave.2")
+                    }
+                    Toggle(isOn: $isHapticsEnabled) {
+                        Label("Вибрация", systemImage: "iphone.radiowaves.left.and.right")
+                    }
+                } header: {
+                    Text("Отклик при наборе")
+                } footer: {
+                    Text("Работает только с включённым «Полным доступом». Звук клавиш также отключается беззвучным режимом iPhone.")
                 }
 
                 Section("Как включить клавиатуру") {
@@ -36,13 +54,13 @@ struct ContentView: View {
                 Section {
                     Label("Зачем нужен «Полный доступ»", systemImage: "hand.raised")
                         .font(.system(size: 15, weight: .semibold))
-                    Text("iOS по умолчанию запрещает сторонним клавиатурам тактильный отклик по нажатию клавиш (вибрацию), пока не выдан полный доступ — таково системное ограничение платформы, не наш выбор. Мы используем этот доступ ТОЛЬКО для вибрации при наборе.")
+                    Text("iOS по умолчанию запрещает сторонним клавиатурам звук и вибрацию при нажатии клавиш, а также чтение настроек из этого приложения, пока не выдан полный доступ — таково системное ограничение платформы, не наш выбор. Мы используем этот доступ ТОЛЬКО для звука, вибрации и переключателей выше.")
                         .font(.system(size: 14))
                         .foregroundStyle(.secondary)
                     Text("Клавиатура НЕ выходит в интернет, НЕ отправляет набранный текст никуда за пределы устройства и не имеет доступа к буферу обмена сверх обычного. Предиктивные подсказки слов считаются полностью на устройстве по встроенному словарю — без каких-либо серверов.")
                         .font(.system(size: 14))
                         .foregroundStyle(.secondary)
-                    Text("Без полного доступа клавиатура работает точно так же — просто без вибрации при наборе.")
+                    Text("Без полного доступа клавиатура работает точно так же — просто без звука и вибрации при наборе.")
                         .font(.system(size: 13))
                         .foregroundStyle(.tertiary)
                 } header: {

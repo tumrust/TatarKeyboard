@@ -173,3 +173,25 @@ enum EmojiData {
         )
     ]
 }
+
+/// Недавно использованные эмодзи — хранятся в UserDefaults самого расширения
+/// (для этого не нужен ни Full Access, ни общий App Group).
+enum RecentEmoji {
+    private static let key = "recentEmojis"
+    /// 4 ряда по 8 — ровно одна страница сетки.
+    private static let limit = 32
+
+    static func load() -> [String] {
+        UserDefaults.standard.stringArray(forKey: key) ?? []
+    }
+
+    /// Поднимает эмодзи в начало списка, сохраняет и возвращает обновлённый список.
+    @discardableResult
+    static func record(_ emoji: String) -> [String] {
+        var updated = load().filter { $0 != emoji }
+        updated.insert(emoji, at: 0)
+        updated = Array(updated.prefix(limit))
+        UserDefaults.standard.set(updated, forKey: key)
+        return updated
+    }
+}

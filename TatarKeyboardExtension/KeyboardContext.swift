@@ -26,7 +26,7 @@ final class KeyboardContext: ObservableObject {
     /// клавиатуре неактивны, пока поле пустое).
     @Published var hasText: Bool = false
 
-    /// Просит ли текущее приложение принудительно тёмное оформление клавиатуры.
+    /// Тёмное оформление: поле попросило тёмную клавиатуру или включена тёмная тема.
     @Published var isDarkAppearance: Bool = false
 
     /// false, если у пользователя включена только эта клавиатура — тогда кнопку
@@ -37,4 +37,21 @@ final class KeyboardContext: ObservableObject {
     /// Разрешить полный доступ). Нужен только для тактильного отклика —
     /// без него UIFeedbackGenerator в расширении молча ничего не делает.
     @Published var hasFullAccess: Bool = false
+
+    /// .no — поле просит не исправлять слова (автозамена выключается).
+    @Published var autocorrectionType: UITextAutocorrectionType = .default
+
+    /// Тип клавиатуры, который запросило поле (цифровая панель, e-mail, URL...).
+    @Published var keyboardType: UIKeyboardType = .default
+
+    /// true — кнопка Return должна быть неактивна, пока в поле нет текста.
+    @Published var enablesReturnKeyAutomatically: Bool = false
+
+    /// Системные замены текста (Настройки → Клавиатура → Замена текста):
+    /// ключ — сокращение в нижнем регистре, значение — полная фраза.
+    @Published var textReplacements: [String: String] = [:]
+
+    /// Увеличивается при каждом изменении документа/курсора снаружи —
+    /// по нему клавиатура пересчитывает автозаглавные и подсказки.
+    @Published var documentChangeCount: Int = 0
 }

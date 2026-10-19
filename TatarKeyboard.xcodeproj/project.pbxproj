@@ -7,13 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1C0FFEE00000000000000A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000A1 /* Assets.xcassets */; };
 		07067860ED37455CBEA60402 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE26693F098A409CBF439F58 /* ContentView.swift */; };
 		0E00DAD41629473398B1A5CA /* SwipeTyping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8C111EC6484C0992346DBB /* SwipeTyping.swift */; };
 		42EE49E15C7341F3A0A5E60E /* TatarKeyboardExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF2E21BB231F44A285C00B6A /* TatarKeyboardExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		62D280CD66A34E40BFC275E0 /* EmojiData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C1C3257D03417BB54AC1BC /* EmojiData.swift */; };
 		7146C3E5522B4670B409423E /* Layouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34533131F8CD45D1916C33D6 /* Layouts.swift */; };
+		854290AC3086B881006B17AA /* KeyboardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854290AB3086B881006B17AA /* KeyboardSettings.swift */; };
+		854290AD3086B881006B17AA /* KeyboardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854290AB3086B881006B17AA /* KeyboardSettings.swift */; };
+		85478D0A30865C75006D05C8 /* TatarLanguageModel.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85478D0930865C75006D05C8 /* TatarLanguageModel.txt */; };
+		85478D0C30865CDF006D05C8 /* TatarLanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85478D0B30865CDF006D05C8 /* TatarLanguageModel.swift */; };
 		ABA07CE5FF0D4C9FB5CE8347 /* KeyboardContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B169131E8D4132AD183BF1 /* KeyboardContext.swift */; };
-		B52CB5E780894081AB4F89B4 /* FrequencyDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFADCF91BFAE43F9A847CBC5 /* FrequencyDictionary.swift */; };
 		C8EA782E0FB7489C8CE0DFF0 /* TatarKeyboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AD3B6457894BCFBE7001CE /* TatarKeyboardApp.swift */; };
 		D8156099F5724617A1D68483 /* NeoAlifTransliteration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3F3C24A9EF4986A48BF566 /* NeoAlifTransliteration.swift */; };
 		EB4D045915D041BAB8EC5E4D /* KeyboardRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF20939527442798C10317E /* KeyboardRootView.swift */; };
@@ -45,18 +49,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A1C0FFEE00000000000000A1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0982950EB5664F889B8D98C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0BF20939527442798C10317E /* KeyboardRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardRootView.swift; sourceTree = "<group>"; };
 		34533131F8CD45D1916C33D6 /* Layouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layouts.swift; sourceTree = "<group>"; };
 		5C3F3C24A9EF4986A48BF566 /* NeoAlifTransliteration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeoAlifTransliteration.swift; sourceTree = "<group>"; };
 		77F075BCEC1F440BB2E7103B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		854290A93086B87A006B17AA /* TatarKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TatarKeyboard.entitlements; sourceTree = "<group>"; };
+		854290AA3086B87B006B17AA /* TatarKeyboardExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TatarKeyboardExtension.entitlements; sourceTree = "<group>"; };
+		854290AB3086B881006B17AA /* KeyboardSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSettings.swift; sourceTree = "<group>"; };
+		85478D0930865C75006D05C8 /* TatarLanguageModel.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = TatarLanguageModel.txt; sourceTree = "<group>"; };
+		85478D0B30865CDF006D05C8 /* TatarLanguageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TatarLanguageModel.swift; sourceTree = "<group>"; };
 		AB8C111EC6484C0992346DBB /* SwipeTyping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTyping.swift; sourceTree = "<group>"; };
 		C3B8B0783683491DA8D69BE2 /* TatarKeyboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TatarKeyboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1B169131E8D4132AD183BF1 /* KeyboardContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardContext.swift; sourceTree = "<group>"; };
 		D5C1C3257D03417BB54AC1BC /* EmojiData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiData.swift; sourceTree = "<group>"; };
 		E9AD3B6457894BCFBE7001CE /* TatarKeyboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TatarKeyboardApp.swift; sourceTree = "<group>"; };
 		EE26693F098A409CBF439F58 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		EFADCF91BFAE43F9A847CBC5 /* FrequencyDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyDictionary.swift; sourceTree = "<group>"; };
 		F6158916D8164B2B8BA23A83 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		FF2E21BB231F44A285C00B6A /* TatarKeyboardExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TatarKeyboardExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -91,8 +100,10 @@
 		9E825F341D5542F8AFA33F85 /* TatarKeyboard */ = {
 			isa = PBXGroup;
 			children = (
+				854290A93086B87A006B17AA /* TatarKeyboard.entitlements */,
 				E9AD3B6457894BCFBE7001CE /* TatarKeyboardApp.swift */,
 				EE26693F098A409CBF439F58 /* ContentView.swift */,
+				A1C0FFEE00000000000000A1 /* Assets.xcassets */,
 				0982950EB5664F889B8D98C3 /* Info.plist */,
 			);
 			path = TatarKeyboard;
@@ -101,6 +112,7 @@
 		A0073F1FB89F43BB86CB66BA /* TatarKeyboardExtension */ = {
 			isa = PBXGroup;
 			children = (
+				854290AA3086B87B006B17AA /* TatarKeyboardExtension.entitlements */,
 				F6158916D8164B2B8BA23A83 /* KeyboardViewController.swift */,
 				0BF20939527442798C10317E /* KeyboardRootView.swift */,
 				34533131F8CD45D1916C33D6 /* Layouts.swift */,
@@ -109,7 +121,9 @@
 				D5C1C3257D03417BB54AC1BC /* EmojiData.swift */,
 				AB8C111EC6484C0992346DBB /* SwipeTyping.swift */,
 				5C3F3C24A9EF4986A48BF566 /* NeoAlifTransliteration.swift */,
-				EFADCF91BFAE43F9A847CBC5 /* FrequencyDictionary.swift */,
+				85478D0930865C75006D05C8 /* TatarLanguageModel.txt */,
+				85478D0B30865CDF006D05C8 /* TatarLanguageModel.swift */,
+				854290AB3086B881006B17AA /* KeyboardSettings.swift */,
 			);
 			path = TatarKeyboardExtension;
 			sourceTree = "<group>";
@@ -204,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85478D0A30865C75006D05C8 /* TatarLanguageModel.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +226,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C0FFEE00000000000000A2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				854290AD3086B881006B17AA /* KeyboardSettings.swift in Sources */,
 				07067860ED37455CBEA60402 /* ContentView.swift in Sources */,
 				C8EA782E0FB7489C8CE0DFF0 /* TatarKeyboardApp.swift in Sources */,
 			);
@@ -232,12 +249,13 @@
 			files = (
 				EB4D045915D041BAB8EC5E4D /* KeyboardRootView.swift in Sources */,
 				7146C3E5522B4670B409423E /* Layouts.swift in Sources */,
+				85478D0C30865CDF006D05C8 /* TatarLanguageModel.swift in Sources */,
+				854290AC3086B881006B17AA /* KeyboardSettings.swift in Sources */,
 				ECB053D7B304420384BD4E54 /* KeyboardViewController.swift in Sources */,
 				ABA07CE5FF0D4C9FB5CE8347 /* KeyboardContext.swift in Sources */,
 				62D280CD66A34E40BFC275E0 /* EmojiData.swift in Sources */,
 				0E00DAD41629473398B1A5CA /* SwipeTyping.swift in Sources */,
 				D8156099F5724617A1D68483 /* NeoAlifTransliteration.swift in Sources */,
-				B52CB5E780894081AB4F89B4 /* FrequencyDictionary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,8 +273,10 @@
 		4D31BC1BA5424C438544FDAC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = TatarKeyboard/TatarKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 10;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -272,6 +292,7 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tatarapps.tatarkeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -342,8 +363,10 @@
 		AA073CD30E36419CBB3D5685 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = TatarKeyboard/TatarKeyboard.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 10;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -359,6 +382,7 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tatarapps.tatarkeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -372,6 +396,7 @@
 		C6B21178518C41F69DC32CBE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TatarKeyboardExtension/TatarKeyboardExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -385,6 +410,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tatarapps.tatarkeyboard.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -450,6 +476,7 @@
 		E4CDD78AC82E47FC82A4E703 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TatarKeyboardExtension/TatarKeyboardExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -463,6 +490,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tatarapps.tatarkeyboard.keyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
