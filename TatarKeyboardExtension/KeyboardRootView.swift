@@ -1,4 +1,3 @@
-//
 //  KeyboardRootView.swift
 //  TatarKeyboardExtension
 //
@@ -20,7 +19,7 @@ struct KeyboardRootView: View {
     @ObservedObject var context: KeyboardContext
     let insertText: (String) -> Void
     let deleteBackward: () -> Void
-    /// Текст непосредственно перед курсором — нужен для автозаглавных, для
+    /// Текст непосредственно пере д курсором — нужен для автозаглавных, для
     /// правила «двойной пробел → точка» и для предиктивных подсказок (какое
     /// слово сейчас набирается).
     let documentContextBeforeInput: () -> String?
@@ -113,7 +112,18 @@ struct KeyboardRootView: View {
     // MARK: - Переключение письменности (без визуальной панели — см. кнопку у пробела)
 
     private func selectScript(_ candidate: TatarScript) {
-        script = candidate
+        // Смена письменности разворачивает layoutDirection на .rightToLeft для
+        // арабицы (и обратно) — это меняет порядок вообще всех клавиш в ряду.
+        // Без явного отключения анимации на именно эту смену состояния SwiftUI
+        // подхватывал соседний .animation(...) с клавиш и красиво, но долго
+        // «переплывал» все кнопки на новые места — выглядело как лишняя
+        // анимация специально у кнопки Aa. Отключаем анимацию только для этого
+        // присваивания, остальные анимации (нажатия клавиш и т.д.) не трогаем.
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            script = candidate
+        }
         shifted = false
         capsLock = false
         clearSuggestions()
@@ -123,7 +133,15 @@ struct KeyboardRootView: View {
     private func cycleScript() {
         let all = TatarScript.allCases
         let idx = all.firstIndex(of: script) ?? 0
-        selectScript(all[(idx + 1) % all.count])
+        let next = all[(idx + 1) % all.count]
+        // Раньше здесь просто менялась script (через selectScript), а mode не
+        // трогался — если нажать «Aa» на экране 123/#+=, письменность внутри
+        // менялась, но пользователь оставался на цифрах и НИЧЕГО не видел:
+        // цифры одинаковы во всех трёх письменностях. Теперь кнопка всегда
+        // возвращает на экран букв — так же, как ведёт себя переключение языка
+        // в системной клавиатуре.
+        selectScript(next)
+        switchMode(.letters)
     }
 
     private func switchMode(_ newMode: Mode) {
@@ -284,87 +302,90 @@ struct KeyboardRootView: View {
     }
 
     // MARK: - Страница эмодзи
-
+    //
+    // ВАЖНО: раньше здесь был непрерывный ScrollView с ScrollViewReader, где все
+    // ~9 категорий (местами по 150-250 эмодзи каждая, то есть суммарно больше
+    // тысячи Text-вьюх) лежали в одном LazyVStack. У сторонних клавиатур очень
+    // жёсткий лимит памяти на процесс — при быстром скролле система успевала
+    // запросить измерение/рендер гораздо большего числа ячеек, чем помещается в
+    // лимит, и процесс падал. ScrollViewReader.scrollTo() дополнительно мешает
+    // LazyVStack оставаться по-настоящему ленивым (ему нужно знать позиции
+    // якорей). Заодно это и была причина, почему подсветка категории не
+    // успевала синхронизироваться со скроллом — не было отслеживания текущей
+    // видимой секции.
+    //
+    // Возврат к постраничному показу (один Grid — одна категория) полностью
+    // убирает обе проблемы: одновременно в памяти только эмодзи ТЕКУЩЕЙ
+    // категории (максимум ~250 ячеек одного плоского LazyVGrid, который
+    // виртуализируется нормально), а подсветка категории — это просто то, что
+    // выбрано кнопкой, рассинхронизации в принципе быть не может.
     private var emojiPad: some View {
-        ScrollViewReader { scrollProxy in
-            VStack(spacing: 8) {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 14) {
-                        ForEach(EmojiData.categories) { category in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(category.title)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(.secondary)
-                                    .padding(.horizontal, 8)
-                                    .padding(.top, 4)
-
-                                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 8), spacing: 8) {
-                                    ForEach(category.emojis, id: \.self) { emoji in
-                                        Button {
-                                            insertText(emoji)
-                                            hapticFeedback(.light)
-                                        } label: {
-                                            Text(emoji)
-                                                .font(.system(size: 28))
-                                                .frame(maxWidth: .infinity, minHeight: 36)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                }
-                            }
-                            .id(category.id)
+        VStack(spacing: 8) {
+            ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 8), spacing: 8) {
+                    ForEach(EmojiData.categories[emojiCategoryIndex].emojis, id: \.self) { emoji in
+                        Button {
+                            insertText(emoji)
+                            hapticFeedback(.light)
+                        } label: {
+                            Text(emoji)
+                                .font(.system(size: 28))
+                                .frame(maxWidth: .infinity, minHeight: 36)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .padding(.vertical, 4)
                 }
-                .frame(height: 180)
+                .padding(.vertical, 4)
+            }
+            .frame(height: letterPadHeight - 6)
 
-                // Нижний ряд: ABC | категории эмодзи | Backspace (как в стандартной клавиатуре iOS)
-                HStack(spacing: 4) {
-                    Button {
-                        switchMode(.letters)
-                    } label: {
-                        Text("ABC")
-                            .font(.system(size: 15, weight: .medium))
-                            .frame(width: context.needsInputModeSwitchKey ? 38 : 42, height: 42)
-                    }
-                    .buttonStyle(TatarKeyStyle())
-
-                    if context.needsInputModeSwitchKey {
-                        Button(action: advanceToNextInputMode) {
-                            Image(systemName: "globe")
-                                .font(.system(size: 17))
-                                .frame(width: 32, height: 42)
-                        }
-                        .buttonStyle(TatarKeyStyle())
-                    }
-
-                    HStack(spacing: 1) {
-                        ForEach(EmojiData.categories) { category in
-                            Button {
-                                emojiCategoryIndex = category.id
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    scrollProxy.scrollTo(category.id, anchor: .top)
-                                }
-                                hapticFeedback(.light)
-                            } label: {
-                                Image(systemName: category.symbolIcon)
-                                    .font(.system(size: 15))
-                                    .foregroundColor(emojiCategoryIndex == category.id ? .primary : .secondary.opacity(0.6))
-                                    .frame(maxWidth: .infinity, minHeight: 42)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .fill(emojiCategoryIndex == category.id ? Color.keyboardSpecialKeyPressed : Color.clear)
-                                    )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    deleteKey
+            // Нижний ряд: ABC | категории эмодзи | Backspace (как в стандартной клавиатуре iOS)
+            HStack(spacing: 4) {
+                Button {
+                    switchMode(.letters)
+                } label: {
+                    Text("ABC")
+                        .font(.system(size: 15, weight: .medium))
                         .frame(width: context.needsInputModeSwitchKey ? 38 : 42, height: 42)
                 }
+                .buttonStyle(TatarKeyStyle())
+
+                if context.needsInputModeSwitchKey {
+                    Button(action: advanceToNextInputMode) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 17))
+                            .frame(width: 32, height: 42)
+                    }
+                    .buttonStyle(TatarKeyStyle())
+                }
+
+                HStack(spacing: 1) {
+                    ForEach(Array(EmojiData.categories.enumerated()), id: \.offset) { index, category in
+                        Button {
+                            emojiCategoryIndex = index
+                            hapticFeedback(.light)
+                        } label: {
+                            Image(systemName: category.symbolIcon)
+                                .font(.system(size: 15))
+                                .foregroundColor(emojiCategoryIndex == index ? .primary : .secondary.opacity(0.6))
+                                .frame(maxWidth: .infinity, minHeight: 42)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(emojiCategoryIndex == index ? Color.keyboardSpecialKeyPressed : Color.clear)
+                                )
+                                // Без этого зона нажатия ограничивается видимыми
+                                // пикселями иконки (мелкая, 15pt) вместо всего
+                                // выделенного под кнопку места — отсюда и жалоба
+                                // «сложно попасть пальцем».
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+
+                deleteKey
+                    .frame(width: context.needsInputModeSwitchKey ? 38 : 42, height: 42)
             }
         }
     }
@@ -518,18 +539,36 @@ struct KeyboardRootView: View {
 // MARK: - Пузырь с увеличенной буквой при нажатии (имитация системной клавиатуры)
 
 private struct KeyPopupBubble: View {
-    let text: String
+    let title: String
+    let alt: String?
+    /// true — палец удерживает клавишу дольше порога, альт-вариант «раскрыт»
+    /// и его уже можно выбрать (см. KeyButton).
+    let altRevealed: Bool
+    /// true — палец сейчас над альт-вариантом (сдвинут вверх), именно он будет
+    /// вставлен при отпускании.
+    let altSelected: Bool
 
     var body: some View {
-        Text(text)
-            .font(.system(size: 30))
-            .frame(width: 42, height: 54)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.systemBackground))
-            )
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black.opacity(0.08)))
-            .shadow(color: .black.opacity(0.25), radius: 5, y: 2)
+        HStack(spacing: 2) {
+            if let alt {
+                Text(alt)
+                    .font(.system(size: altSelected ? 20 : 13, weight: altSelected ? .semibold : .regular))
+                    .foregroundColor(altRevealed ? (altSelected ? .primary : .secondary) : Color.secondary.opacity(0.35))
+                    .frame(height: 22)
+            }
+
+            Text(title)
+                .font(.system(size: (alt != nil && altSelected) ? 18 : 26, weight: .regular))
+                .foregroundColor((alt != nil && altRevealed && altSelected) ? .secondary : .primary)
+        }
+        .frame(width: alt != nil ? 54 : 36, height: 42)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(Color.keyboardBubbleBackground)
+                .shadow(color: Color.keyboardKeyShadow, radius: 0, x: 0, y: 1)
+        )
+        .animation(.easeOut(duration: 0.2), value: altSelected)
+        .animation(.easeOut(duration: 0.2), value: altRevealed)
     }
 }
 
@@ -542,8 +581,16 @@ private struct KeyButton: View {
     let onInsert: (String) -> Void
 
     @State private var isPressed = false
-    @State private var timer: Timer?
-    @State private var altFired = false
+    /// true — удержание превысило altRevealDelay и альт-вариант уже можно выбрать.
+    @State private var isAltRevealed = false
+    /// true — палец сейчас сдвинут вверх достаточно, чтобы считать выбранным альт.
+    @State private var isAltSelected = false
+
+    /// Через сколько секунд удержания «раскрывается» альт-вариант в бабле.
+    private let altRevealDelay: TimeInterval = 0.35
+    /// На сколько пунктов нужно сдвинуть палец вверх, чтобы выбрать альт —
+    /// подобрано так, чтобы задеть сам бабл (он смещён на -58pt), не раньше.
+    private let altSelectDragThreshold: CGFloat = 18
 
     var body: some View {
         Text(title)
@@ -563,20 +610,19 @@ private struct KeyButton: View {
                         .padding(3)
                 }
             }
-            // Всплывающий пузырь с увеличенной буквой над клавишей — как в
-            // системной клавиатуре iOS. Сама клавиша при этом не увеличивается
-            // (только слегка темнеет), крупная копия символа показывается сверху.
-            // Примечание: для самого верхнего ряда пузырь может частично не
-            // поместиться, если высота расширения-клавиатуры мала — системные
-            // клавиатуры используют для этого специальный слой поверх всего
-            // экрана, недоступный сторонним расширениям.
+            // Всплывающий пузырь: показывает крупно основной символ сразу по
+            // нажатию, а если есть альт-вариант и нажатие удерживается дольше
+            // altRevealDelay — можно, не отпуская палец, сдвинуть его вверх и
+            // выбрать альт-символ (он подсветится), отпустить — вставится
+            // именно выбранный вариант. Короткий тап всегда вставляет основной
+            // символ, независимо от того, есть у клавиши альт или нет.
             .overlay(alignment: .top) {
                 if isPressed {
-                    KeyPopupBubble(text: title)
-                        .offset(y: -54)
+                    KeyPopupBubble(title: title, alt: alt, altRevealed: isAltRevealed, altSelected: isAltSelected)
+                        .offset(y: -58)
                         .allowsHitTesting(false)
                         .transition(.asymmetric(
-                            insertion: .scale(scale: 0.6, anchor: .bottom).combined(with: .opacity),
+                            insertion: .scale(scale: 0.5, anchor: .bottom).combined(with: .opacity),
                             removal: .opacity
                         ))
                 }
@@ -586,27 +632,37 @@ private struct KeyButton: View {
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        guard !isPressed else { return }
-                        isPressed = true
-                        altFired = false
-                        if let alt {
-                            timer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: false) { _ in
-                                // Если тем временем распознан свайп через несколько
-                                // клавиш — не подставляем второй символ этой клавиши.
-                                guard !swipeState.isActive else { return }
-                                altFired = true
-                                onInsert(alt)
+                    .onChanged { value in
+                        if !isPressed {
+                            isPressed = true
+                            isAltRevealed = false
+                            isAltSelected = false
+                            if alt != nil {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + altRevealDelay) {
+                                    // Если к этому моменту палец уже отпущен — просто
+                                    // ничего не делаем, вставка уже произошла в onEnded.
+                                    guard isPressed else { return }
+                                    isAltRevealed = true
+                                }
                             }
                         }
+                        guard alt != nil, isAltRevealed, !swipeState.isActive else { return }
+                        isAltSelected = value.translation.height < -altSelectDragThreshold
                     }
                     .onEnded { _ in
-                        timer?.invalidate(); timer = nil
-                        isPressed = false
+                        defer {
+                            isPressed = false
+                            isAltRevealed = false
+                            isAltSelected = false
+                        }
                         // Если жест распознан как свайп через несколько букв — слово
                         // уже вставлено в commitSwipe(), обычную вставку пропускаем.
                         guard !swipeState.isActive else { return }
-                        if !altFired { onInsert(title) }
+                        if isAltRevealed, isAltSelected, let alt {
+                            onInsert(alt)
+                        } else {
+                            onInsert(title)
+                        }
                     }
             )
     }
@@ -722,5 +778,11 @@ private extension Color {
         trait.userInterfaceStyle == .dark
             ? UIColor.clear
             : UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.35)
+    })
+    
+    static let keyboardBubbleBackground = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(white: 0.38, alpha: 1.0)
+            : UIColor.white                       
     })
 }

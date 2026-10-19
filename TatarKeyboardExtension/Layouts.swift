@@ -129,7 +129,7 @@ enum TatarLayout {
             KeyDefinition(c("ө","Ө"), alt: c("ц","Ц")),
             KeyDefinition(c("у","У")),
             KeyDefinition(c("к","К")),
-            KeyDefinition(c("е","Е")),
+            KeyDefinition(c("е","Е"), alt: c("ё","Ё")),
             KeyDefinition(c("н","Н")),
             KeyDefinition(c("г","Г")),
             KeyDefinition(c("ш","Ш")),
@@ -149,7 +149,7 @@ enum TatarLayout {
             KeyDefinition(c("л","Л")),
             KeyDefinition(c("д","Д")),
             KeyDefinition(c("ң","Ң"), alt: c("ж","Ж")),
-            KeyDefinition(c("э","Э"), alt: "’")
+            KeyDefinition(c("э","Э")),
         ]
         let row3: [KeyDefinition] = [
             KeyDefinition(c("я","Я")),
@@ -161,7 +161,7 @@ enum TatarLayout {
             KeyDefinition(c("җ","Җ"), alt: c("ь","Ь")),
             KeyDefinition(c("б","Б")),
             KeyDefinition(c("ю","Ю")),
-            KeyDefinition(c("һ","Һ"), alt: c("ё","Ё"))
+            KeyDefinition(c("һ","Һ")),
         ]
         return [row1, row2, row3]
     }
@@ -208,8 +208,7 @@ enum TatarLayout {
             KeyDefinition(c("b","B")),
             KeyDefinition(c("n","N"), alt: c("ñ","Ñ")),
             KeyDefinition(c("m","M")),
-            KeyDefinition(c("ç","Ç")),
-            KeyDefinition(c("w","W"))
+            KeyDefinition(c("ç","Ç"))
         ]
         return [row1, row2, row3]
     }
